@@ -21,7 +21,7 @@ public class VentanaClienteController {
 	
 	
 	public VentanaClienteController() {
-//		cdi = new ClientDaoImp();
+
 	}
 	
 	/**

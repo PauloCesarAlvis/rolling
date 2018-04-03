@@ -11,6 +11,7 @@ import java.util.Set;
 
 import com.rolling.hibernate.dao.ItemWishDaoImp;
 import com.rolling.hibernate.dao.WishDaoImp;
+import com.rolling.hibernate.gui.VentanaVenta;
 import com.rolling.hibernate.dao.ProductDaoImp;
 import com.rolling.hibernate.model.ItemWish;
 import com.rolling.hibernate.model.Wish;
@@ -19,11 +20,11 @@ import com.rolling.hibernate.model.Product;
 public class VentanaVentaController {
 
 	private ProductDaoImp pdi;
-	private ItemWishDaoImp iodi;
-	private WishDaoImp odi;
+	private ItemWishDaoImp iwdi;
+	private WishDaoImp wdi;
 
 	public VentanaVentaController() {
-
+		
 	}
 
 	/**
@@ -42,14 +43,16 @@ public class VentanaVentaController {
 		DateFormat format = new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss");
 		Date dat = (Date) format.parse(format.format(date));
 		Wish wish = new Wish(dat, valor, place);
-		odi = new WishDaoImp();
+		wdi = new WishDaoImp();
 
 		wish.setItemOrders(itemsWish);
-		odi.saveWish(wish);
+		wdi.saveWish(wish);
+		wdi.getSession().getSessionFactory().close();
 		for (ItemWish i : itemsWish) {
-			iodi = new ItemWishDaoImp();
+			iwdi = new ItemWishDaoImp();
 			i.setWish(wish);
-			iodi.saveItemWish(i);
+			iwdi.saveItemWish(i);
+			iwdi.getSession().getSessionFactory().close();
 		}
 		return wish.getIdWish();
 	}
@@ -64,13 +67,14 @@ public class VentanaVentaController {
 	 */
 	public boolean updateWish(Set<ItemWish> itemsWish, Long id, Long value) {
 		
-		odi = new WishDaoImp();
-		Wish wish = odi.findById(id);
+		wdi = new WishDaoImp();
+		Wish wish = wdi.findById(id);
 		if (wish != null) {
 			wish.setItemOrders(itemsWish);
 			wish.setPrice(value);
-			odi.updateWish(wish);
-			iodi = new ItemWishDaoImp();
+			wdi.updateWish(wish);
+			wdi.getSession().getSessionFactory().close();
+			iwdi = new ItemWishDaoImp();
 			for (ItemWish itemWish : itemsWish) {
 				if (itemWish.getIdItemOrder() == null) {
 					/**
@@ -79,13 +83,35 @@ public class VentanaVentaController {
 					 * asignar la lista de items a la orden (wish)
 					 */
 					itemWish.setWish(wish);
-					iodi.saveItemWish(itemWish);
+					iwdi.saveItemWish(itemWish);
+					iwdi.getSession().getSessionFactory().close();
 				}
 			}
 			return true;
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Metodo que retira una orden del pedido.
+	 * En caso de existir un solo producto en la lista
+	 * y sea este el que se pretende retirar, se debe eliminar
+	 * tambien la persistencia de la orden (Wish) pues no tiene
+	 * asosiado ningun producto (ItemWish)
+	 * @param idItem
+	 * @param compra
+	 * @param idWish
+	 * @return
+	 */
+	public boolean deleteItemWish(Long idItem, Set<ItemWish> compra, Long idWish) {
+		iwdi = new ItemWishDaoImp();
+		boolean r = iwdi.deleteItemWish(idItem);
+		if (compra.size() == 0) {
+			wdi = new WishDaoImp();
+			wdi.deleteWish(idWish);
+		}
+		return r;
 	}
 	/**
 	 * Metodo que busca un Wish(orden) de pedido
@@ -96,8 +122,10 @@ public class VentanaVentaController {
 	 */
 	public Wish findWishById(Long id) {
 		
-		odi = new WishDaoImp();
-		return odi.findById(id);
+		wdi = new WishDaoImp();
+		Wish wish = wdi.findById(id);
+		wdi.getSession().getSessionFactory().close();
+		return wish;
 	}
 	/**
 	 * Metodo que lista los productos disponibles en la BD.
@@ -107,7 +135,9 @@ public class VentanaVentaController {
 	public List<Product> loadProducts() {
 
 		pdi = new ProductDaoImp();
-		return pdi.findProducts();
+		List<Product> list = pdi.findProducts();
+		pdi.getSession().getSessionFactory().close();
+		return list;
 	}
 
 	/**
@@ -119,6 +149,8 @@ public class VentanaVentaController {
 	public Product findById(Long idProduct) {
 
 		pdi = new ProductDaoImp();
-		return pdi.findById(idProduct);
+		Product p = pdi.findById(idProduct);
+		pdi.getSession().getSessionFactory().close();
+		return p;
 	}
 }

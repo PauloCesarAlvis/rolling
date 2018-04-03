@@ -8,7 +8,7 @@ public interface ItemWishDao  {
 
 	void saveItemWish(ItemWish itemWish);
 	
-	void deleteItemWish(Long idItemWish);
+	boolean deleteItemWish(Long idItemWish);
 	
 	void updateItemWish(ItemWish itemWish);
 	

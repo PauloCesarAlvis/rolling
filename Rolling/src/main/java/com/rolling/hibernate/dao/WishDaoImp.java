@@ -10,7 +10,7 @@ public class WishDaoImp extends RollingSession implements WishDao {
 	
 	public WishDaoImp() {
 		
-		rollingSession = new  RollingSession();
+			rollingSession = new  RollingSession();
 		
 	}
 
@@ -18,6 +18,8 @@ public class WishDaoImp extends RollingSession implements WishDao {
 
 		rollingSession.getSession().persist(wish);
 		rollingSession.getSession().getTransaction().commit();
+//		rollingSession.getSession().clear();
+		rollingSession.getSession().getSessionFactory().close();
 	}
 
 	public void deleteWish(Long idWish) {
@@ -27,6 +29,8 @@ public class WishDaoImp extends RollingSession implements WishDao {
 			
 			rollingSession.getSession().delete(w);
 			rollingSession.getSession().getTransaction().commit();
+//			rollingSession.getSession().clear();
+			rollingSession.getSession().getSessionFactory().close();
 		}
 	}
 
@@ -34,17 +38,22 @@ public class WishDaoImp extends RollingSession implements WishDao {
 
 		rollingSession.getSession().update(wish);
 		rollingSession.getSession().getTransaction().commit();
+//		rollingSession.getSession().clear();
+		rollingSession.getSession().getSessionFactory().close();
 	}
 
 	public List<Wish> findWishes() {
 
-		List<Wish> list = rollingSession.getSession().createQuery("from Order").getResultList();
+		List<Wish> list = rollingSession.getSession().createQuery("from Wish").getResultList();
+		rollingSession.getSession().getSessionFactory().close();
 		return list;
 	}
 
 	public Wish findById(Long idWish) {
 		
 		Wish order = rollingSession.getSession().get(Wish.class, idWish);
+//		rollingSession.getSession().clear();
+//		rollingSession.getSession().getSessionFactory().close();
 		return order;
 	}
 

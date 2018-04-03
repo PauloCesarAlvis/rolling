@@ -18,6 +18,9 @@ import java.awt.Color;
 import javax.swing.border.TitledBorder;
 
 import com.rolling.hibernate.controller.VentanaMesasController;
+import com.rolling.hibernate.dao.ItemWishDaoImp;
+import com.rolling.hibernate.dao.ProductDaoImp;
+import com.rolling.hibernate.dao.WishDaoImp;
 
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
@@ -157,7 +160,7 @@ public class VentanaMesas extends JFrame {
 			
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				activatePlace(btnBarra5);
+				activatePlace(btnMesa5);
 			}
 		});
 		
@@ -439,7 +442,4 @@ public class VentanaMesas extends JFrame {
 		return btnMesa1;
 	}
 
-	
-	
-	
 }

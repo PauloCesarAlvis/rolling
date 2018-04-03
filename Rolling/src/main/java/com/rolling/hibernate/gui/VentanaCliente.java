@@ -17,6 +17,7 @@ import javax.swing.table.TableModel;
 import com.rolling.hibernate.controller.VentanaClienteController;
 import com.rolling.hibernate.model.Client;
 import com.rolling.hibernate.model.Product;
+import com.rolling.hibernate.model.Purchase;
 
 import java.awt.ScrollPane;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -82,18 +84,18 @@ public class VentanaCliente extends JFrame {
 	/**
 	 * Launch the application.
 	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					VentanaCliente frame = new VentanaCliente();
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
+	// public static void main(String[] args) {
+	// EventQueue.invokeLater(new Runnable() {
+	// public void run() {
+	// try {
+	// VentanaCliente frame = new VentanaCliente();
+	// frame.setVisible(true);
+	// } catch (Exception e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// });
+	// }
 
 	/**
 	 * Create the frame.
@@ -253,10 +255,11 @@ public class VentanaCliente extends JFrame {
 		btnBuscar.setBounds(359, 77, 49, 23);
 		panelFormulario.add(btnBuscar);
 		btnBuscar.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				findById();
+				loadClientsPurchases();
 			}
 		});
 
@@ -267,7 +270,7 @@ public class VentanaCliente extends JFrame {
 		btnAdd.setBounds(359, 131, 49, 23);
 		panelFormulario.add(btnAdd);
 		btnAdd.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				saveClient();
@@ -294,7 +297,7 @@ public class VentanaCliente extends JFrame {
 		lbTotalCompras.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lbTotalCompras.setBounds(20, 117, 113, 14);
 		panelCompras.add(lbTotalCompras);
-		
+
 		jtFormatTotalComprado = new JFormattedTextField();
 		jtFormatTotalComprado.setEditable(false);
 		jtFormatTotalComprado.setBounds(140, 115, 143, 20);
@@ -319,7 +322,7 @@ public class VentanaCliente extends JFrame {
 		lblTotalCreditos.setFont(new Font("Tahoma", Font.BOLD, 12));
 		lblTotalCreditos.setBounds(20, 115, 113, 14);
 		panelCreditos.add(lblTotalCreditos);
-		
+
 		jtFormatCreditos = new JFormattedTextField();
 		jtFormatCreditos.setEditable(false);
 		jtFormatCreditos.setBounds(140, 113, 141, 20);
@@ -333,8 +336,8 @@ public class VentanaCliente extends JFrame {
 		btnReset.setForeground(Color.BLUE);
 		btnReset.setBounds(339, 476, 89, 23);
 		contentPane.add(btnReset);
-		btnReset.addActionListener(new  ActionListener() {
-			
+		btnReset.addActionListener(new ActionListener() {
+
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				reset();
@@ -350,19 +353,20 @@ public class VentanaCliente extends JFrame {
 		btnMenu.setBounds(10, 476, 89, 23);
 		contentPane.add(btnMenu);
 		btnMenu.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				goMenu();
 			}
 		});
-		
+
 		JPanel panelClientes = new JPanel();
-		panelClientes.setBorder(new TitledBorder(null, "Clientes Registrados", TitledBorder.CENTER, TitledBorder.TOP, null, Color.DARK_GRAY));
+		panelClientes.setBorder(new TitledBorder(null, "Clientes Registrados", TitledBorder.CENTER, TitledBorder.TOP,
+				null, Color.DARK_GRAY));
 		panelClientes.setBounds(436, 11, 584, 460);
 		contentPane.add(panelClientes);
 		panelClientes.setLayout(null);
-		
+
 		tableClientes = new JTable();
 		tableClientes.setModel(modeloClientes);
 		JScrollPane scrollPaneClientes = new JScrollPane();
@@ -371,34 +375,35 @@ public class VentanaCliente extends JFrame {
 		scrollPaneClientes.setRowHeaderView(tableClientes);
 		scrollPaneClientes.setViewportView(tableClientes);
 		tableClientes.addMouseListener(new MouseListener() {
-			
+
 			public void mouseReleased(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			public void mousePressed(MouseEvent e) {
 				// TODO Auto-generated method stub
 				int row = tableClientes.getSelectedRow();
 				selectClient(row);
+				loadClientsPurchases();
 			}
-			
+
 			public void mouseExited(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			public void mouseEntered(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			public void mouseClicked(MouseEvent e) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
+
 		btnUpdateClient = new JButton("");
 		btnUpdateClient.setToolTipText("Actualizar un cliente");
 		btnUpdateClient.setBackground(SystemColor.menu);
@@ -406,13 +411,13 @@ public class VentanaCliente extends JFrame {
 		btnUpdateClient.setBounds(485, 428, 43, 28);
 		panelClientes.add(btnUpdateClient);
 		btnUpdateClient.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				updateClient();
 			}
 		});
-		
+
 		btnDelete = new JButton("");
 		btnDelete.setToolTipText("Eliminar un cliente");
 		btnDelete.setIcon(new ImageIcon(VentanaCliente.class.getResource("/images/delete.png")));
@@ -420,13 +425,12 @@ public class VentanaCliente extends JFrame {
 		btnDelete.setBounds(532, 428, 43, 28);
 		panelClientes.add(btnDelete);
 		btnDelete.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				deleteClient();
 			}
 		});
-		
 
 		vcc = new VentanaClienteController();
 		this.vm = vm;
@@ -435,19 +439,24 @@ public class VentanaCliente extends JFrame {
 	}
 
 	/**
-	 * Metodo que lista las compras y creditos de un cliente.
+	 * Metodo que lista las compras del cliente.
 	 */
-	public void loadClientsHistory() {
-		
-//		DefaultTableModel model = (DefaultTableModel) tab.getModel();
-//		List<Product> products = vpc.cargarProductos();
-//		
-//		for (Product p : products) {
-//			Object row [] = {p.getName(), p.getSale_price(), p.getQuantity(), p.getContent()};
-//			model.addRow(row);
-//		}
+	public void loadClientsPurchases() {
+
+		Client c = vcc.findById(jtCedula.getText());
+		if (c != null) {
+			long totalBought = 0;
+			DefaultTableModel model = (DefaultTableModel) tableCompras.getModel();
+			Set<Purchase> purchases = c.getPurchases();
+
+			for (Purchase p : purchases) {
+				Object row[] = { p.getPurchase_date(), p.getPurchase_value(), p.getPurchasesItems().size() };
+				model.addRow(row);
+				totalBought += p.getPurchase_value();
+			}
+			jtFormatTotalComprado.setText(String.valueOf(totalBought));
+		}
 	}
-	
 
 	/**
 	 * Este metodo tiene como función la de enviar los datos de las cajas de texto
@@ -487,7 +496,8 @@ public class VentanaCliente extends JFrame {
 
 		try {
 			vcc.updateClient(name, lastname, identification, telephone, email);
-			JOptionPane.showMessageDialog(null, actualizacionCompleta, "Info actualización", JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, actualizacionCompleta, "Info actualización",
+					JOptionPane.INFORMATION_MESSAGE);
 			reset();
 			loadClients();
 		} catch (Exception e) {
@@ -496,24 +506,25 @@ public class VentanaCliente extends JFrame {
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Metodo que elimina un cliente de la BD.
 	 */
 	public void deleteClient() {
-		
+
 		String idClient = jtCedula.getText();
-		if(vcc.deleteClient(idClient)) {
+		if (vcc.deleteClient(idClient)) {
 			JOptionPane.showMessageDialog(null, borradoCompleto, "Info borrado", JOptionPane.INFORMATION_MESSAGE);
 			reset();
 			loadClients();
-		}else {
+		} else {
 			JOptionPane.showMessageDialog(null, borradoIncompleto, "Info borrado", JOptionPane.ERROR_MESSAGE);
 		}
 	}
+
 	/**
-	 * Metodo que permite cargar los datos de un cliente seleccionado de la lista
-	 * de clientes registrados.
+	 * Metodo que permite cargar los datos de un cliente seleccionado de la lista de
+	 * clientes registrados.
 	 * 
 	 * @param row
 	 */
@@ -529,7 +540,7 @@ public class VentanaCliente extends JFrame {
 			jtCorreo.setText(c.getEmail());
 		}
 	}
-	
+
 	/**
 	 * Metodo encargado de encontrar un cliente por su numero de cedula.
 	 */
@@ -547,7 +558,7 @@ public class VentanaCliente extends JFrame {
 			JOptionPane.showMessageDialog(null, busquedaCliente, "Busqueda Cliente", JOptionPane.WARNING_MESSAGE);
 		}
 	}
-	
+
 	/**
 	 * Metodo que lista los clientes almacenados en la BD.
 	 */
@@ -562,7 +573,7 @@ public class VentanaCliente extends JFrame {
 			model.addRow(row);
 		}
 	}
-	
+
 	/**
 	 * Metodo que limpia las filas de un tabla.
 	 * 
@@ -576,45 +587,47 @@ public class VentanaCliente extends JFrame {
 			modelo.removeRow(0);
 		}
 	}
+
 	/**
 	 * Metodo que limpia todos los campos de la ventana.
 	 */
 	public void reset() {
-		
+
 		jtNombre.setText(null);
 		jtApellidos.setText(null);
 		jtCedula.setText(null);
 		jtTelefono.setText(null);
 		jtCorreo.setText(null);
-		
+
 		cleanTable(tableCompras);
 		cleanTable(tableCreditos);
 	}
-	
+
 	/**
 	 * Metodo que limpia las filas de un tabla.
+	 * 
 	 * @param tabla
 	 */
 	public void cleanTable(JTable tabla) {
-		  
+
 		DefaultTableModel modelo = (DefaultTableModel) tabla.getModel();
-		
-		while(modelo.getRowCount() > 0) {
+
+		while (modelo.getRowCount() > 0) {
 			modelo.removeRow(0);
 		}
 	}
-	
+
 	/**
 	 * Metodo que vuelve a la ventana inicial.
 	 */
 	public void goMenu() {
-		
+
 		reset();
 		setVisible(false);
 		vm.setVisible(true);
-//		vm = new VentanaMenu();
-//		setVisible(false);
-//		vm.setVisible(true);
-		
+		// vm = new VentanaMenu();
+		// setVisible(false);
+		// vm.setVisible(true);
+
 	}
 }

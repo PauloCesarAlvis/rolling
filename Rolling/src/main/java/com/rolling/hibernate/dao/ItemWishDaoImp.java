@@ -23,33 +23,44 @@ public class ItemWishDaoImp extends RollingSession implements ItemWishDao {
 
 		rollingSession.getSession().persist(itemWish);
 		rollingSession.getSession().getTransaction().commit();
+//		rollingSession.getSession().clear();
+		rollingSession.getSession().getSessionFactory().close();
 	}
 
-	public void deleteItemWish(Long idItemWish) {
+	public boolean deleteItemWish(Long idItemWish) {
 		
 		ItemWish i = findById(idItemWish);
 		if (i != null) {
 			
 			rollingSession.getSession().delete(i);
 			rollingSession.getSession().getTransaction().commit();
+//			rollingSession.getSession().clear();
+			rollingSession.getSession().getSessionFactory().close();
+			return true;
 		}
+		return false;
 	}
 
 	public void updateItemWish(ItemWish itemWish) {
 
 		rollingSession.getSession().update(itemWish);
 		rollingSession.getSession().getTransaction().commit();
+//		rollingSession.getSession().clear();
+		rollingSession.getSession().getSessionFactory().close();
 	}
 
 	public List<ItemWish> findItemWishes() {
 
-		return rollingSession.getSession().createQuery("from ItemOrder").getResultList();
+		List<ItemWish> list = rollingSession.getSession().createQuery("from ItemWish").getResultList();
+		rollingSession.getSession().getSessionFactory().close();
+		return list;
 	}
 
 	public ItemWish findById(Long idItemOrder) {
 		
 		ItemWish iw = rollingSession.getSession().get(ItemWish.class, idItemOrder);
-		rollingSession.getSession().clear();
+//		rollingSession.getSession().clear();
+//		rollingSession.getSession().getSessionFactory().close();
 		return iw;
 	}
 

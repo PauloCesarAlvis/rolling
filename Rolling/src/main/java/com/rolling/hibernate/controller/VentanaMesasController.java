@@ -71,6 +71,7 @@ public class VentanaMesasController {
 		for (Puesto puesto : puestos) {
 			if (puesto.getName().equals(name)) {
 				p = puesto;
+				break;
 			}
 		}
 		return p;

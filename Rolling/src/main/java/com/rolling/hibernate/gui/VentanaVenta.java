@@ -18,6 +18,9 @@ import org.hibernate.mapping.TableOwner;
 
 import com.rolling.hibernate.controller.VentanaMesasController.Puesto;
 import com.rolling.hibernate.controller.VentanaVentaController;
+import com.rolling.hibernate.dao.ItemWishDaoImp;
+import com.rolling.hibernate.dao.ProductDaoImp;
+import com.rolling.hibernate.dao.WishDaoImp;
 import com.rolling.hibernate.model.Client;
 import com.rolling.hibernate.model.ItemWish;
 import com.rolling.hibernate.model.Product;
@@ -34,6 +37,8 @@ import javax.swing.ImageIcon;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DecimalFormat;
@@ -76,6 +81,7 @@ public class VentanaVenta extends JFrame {
 	 * encontrarla cada que se añada un nuevo producto.
 	 */
 	private long idWishActual;
+	
 	/**
 	 * Launch the application.
 	 */
@@ -182,18 +188,50 @@ public class VentanaVenta extends JFrame {
 		JPanel panelPedido = new JPanel();
 		panelPedido.setBorder(
 				new TitledBorder(null, "Pedido", TitledBorder.LEFT, TitledBorder.TOP, null, Color.DARK_GRAY));
-		panelPedido.setBounds(339, 106, 323, 220);
+		panelPedido.setBounds(339, 106, 323, 226);
 		contentPane.add(panelPedido);
 		panelPedido.setLayout(null);
 
 		JScrollPane scrollPanePedido = new JScrollPane();
-		scrollPanePedido.setBounds(10, 21, 303, 188);
+		scrollPanePedido.setBounds(10, 21, 303, 194);
 		panelPedido.add(scrollPanePedido);
 
 		tablePedido = new JTable();
 		tablePedido.setModel(modeloPedido);
 		scrollPanePedido.setRowHeaderView(tablePedido);
 		scrollPanePedido.setViewportView(tablePedido);
+		tablePedido.addMouseListener(new MouseListener() {
+			
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				// TODO Auto-generated method stub
+				deleteWish();
+			}
+			
+			@Override
+			public void mousePressed(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseExited(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 
 		JPanel panelCobro = new JPanel();
 		panelCobro
@@ -264,6 +302,7 @@ public class VentanaVenta extends JFrame {
 		productosComprados = new HashSet();
 		loadProducts();
 		idWishActual = vm.getIdWishGlobal();
+//		System.out.println("Ventana Venta "+vm.getWdi().findById(77L).getItemOrders().size());
 		wish = findWishbyId();
 		if (wish != null) {
 			// existe una orden asignada al puesto
@@ -313,7 +352,63 @@ public class VentanaVenta extends JFrame {
 					JOptionPane.ERROR_MESSAGE);
 		}
 	}
+	
+	/**
+	 * Metodo utilizado para retirar un producto 
+	 * de la orden hecha por el cliente. En caso
+	 * que el cliente se arrepienta o el mesero 
+	 * ingrese mal la orden.
+	 */
+	private void deleteWish() {
 
+		wish = findWishbyId();
+		int row = tablePedido.getSelectedRow();
+		long id = (long) Integer.parseInt(tablePedido.getValueAt(row, 0).toString());
+		long idItemDelete = 0;
+		try {
+		if (wish != null) {
+			// existe una orden asignada al puesto
+			for (ItemWish iw : wish.getItemOrders()) {
+				if (id == iw.getProduct().getIdProduct()) {
+					wish.getItemOrders().remove(iw);
+					idItemDelete = iw.getIdItemOrder();
+				}
+			}
+			productosComprados.clear();
+			productosComprados.addAll(wish.getItemOrders());
+			loadOrder();
+			comboBoxPuesto.setSelectedItem(wish.getPlace());
+			if (deleteItemWish(idItemDelete, wish.getIdWish())) {
+				JOptionPane.showMessageDialog(null, "Eliminado");
+			}
+		}
+//		puestoCobrar = comboBoxPuesto.getSelectedItem().toString();
+		}catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Error quitando orden", "Remover Orden",
+					JOptionPane.ERROR_MESSAGE);
+		}
+	
+	}
+
+	/**
+	 * Metodo que elimina una orden de la lista de pedido.
+	 * Para cuando solo existe un producto en la orden, el
+	 * boton asociado al puesto vuelve a su estado inactivo. 
+	 * En caso contrario solo retira el producto y recalcula 
+	 * el valor a pagar por parte del cliente.
+	 * @param idItem
+	 * @param idWish
+	 * @return
+	 */
+	private boolean deleteItemWish(Long idItem, Long idWish) {
+		if (productosComprados.size() == 0) {
+			vm.getVmc().quitPlace(getPuestoCobrar());
+			vm.resetButton(getPuestoCobrar());
+		}
+		return vvc.deleteItemWish(idItem,productosComprados, idWish);
+	}
 	/**
 	 * Metodo que persiste una orden hecha por un cliente y esta sujeta a
 	 * modificaciones antes de convertirse en una compra.
@@ -353,10 +448,13 @@ public class VentanaVenta extends JFrame {
 	 */
 	private Wish findWishbyId() {
 
+		if (idWishActual != 0) {
+			
 		Wish wish = vvc.findWishById(idWishActual);
 		if (wish != null) { // existe una orden asignada al puesto
 			return wish;
 		} 
+		}
 		return null;
 	}
 
@@ -518,7 +616,5 @@ public class VentanaVenta extends JFrame {
 	public void setPuestoCobrar(String puestoCobrar) {
 		this.puestoCobrar = puestoCobrar;
 	}
-	
-	
-	
+
 }

@@ -10,7 +10,8 @@ public class ProductDaoImp extends RollingSession implements ProductDao {
 
 	public ProductDaoImp() {
 
-		rollingSession = new RollingSession();
+			
+			rollingSession = new RollingSession();
 
 	}
 
@@ -18,6 +19,8 @@ public class ProductDaoImp extends RollingSession implements ProductDao {
 
 		rollingSession.getSession().persist(product);
 		rollingSession.getSession().getTransaction().commit();
+//		rollingSession.getSession().clear();
+		rollingSession.getSession().getSessionFactory().close();
 	}
 
 	public boolean deleteProduct(Long idProduct) {
@@ -27,6 +30,8 @@ public class ProductDaoImp extends RollingSession implements ProductDao {
 
 			rollingSession.getSession().delete(t);
 			rollingSession.getSession().getTransaction().commit();
+//			rollingSession.getSession().clear();
+			rollingSession.getSession().getSessionFactory().close();
 			return true;
 		}
 		return false;
@@ -36,17 +41,23 @@ public class ProductDaoImp extends RollingSession implements ProductDao {
 
 		rollingSession.getSession().update(product);
 		rollingSession.getSession().getTransaction().commit();
+//		rollingSession.getSession().clear();
+		rollingSession.getSession().getSessionFactory().close();
 	}
 
 	public List<Product> findProducts() {
-
-		return rollingSession.getSession().createQuery("from Product").getResultList();
+		
+		List<Product> products = rollingSession.getSession().createQuery("from Product").getResultList();
+//		rollingSession.getSession().clear();
+		rollingSession.getSession().getSessionFactory().close();
+		return products;
 	}
 
 	public Product findById(Long idProduct) {
 
 		Product p = rollingSession.getSession().get(Product.class, idProduct);
-		rollingSession.getSession().clear();
+//		rollingSession.getSession().clear();
+//		rollingSession.getSession().getSessionFactory().close();
 		return p;
 	}
 

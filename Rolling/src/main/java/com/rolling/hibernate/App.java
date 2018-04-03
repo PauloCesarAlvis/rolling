@@ -5,11 +5,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import com.rolling.hibernate.dao.ClientDaoImp;
 import com.rolling.hibernate.dao.WishDaoImp;
 import com.rolling.hibernate.dao.ProductDaoImp;
 import com.rolling.hibernate.model.Client;
+import com.rolling.hibernate.model.ItemWish;
 import com.rolling.hibernate.model.Wish;
 import com.rolling.hibernate.model.Product;
 
@@ -56,14 +58,36 @@ public class App
 //			upd.setName("el nuevo");
 //			teacherDaoImp.updateTeacher(upd);
 //		}
-        WishDaoImp odi = new WishDaoImp();
+
 //        Order o = new Order(8L, "Mesa 1");
 //        odi.saveOrder(o);
 //        List<Wish> orders = odi.findWishes();
 //        for (Wish c: orders) {
 //			System.out.println("price :" + c.getPrice());
 //		}
+        int cont = 0;
+        for (int i = 0; i < 100; i++) {
+        	ProductDaoImp pdi = new ProductDaoImp();
+        cont +=1;
+        List<Product> ps = pdi.findProducts();
+        for (Product p : ps) {
+			System.out.println("Conexión: "+cont+"Prod: "+p.getName());
+		}
+        pdi.getSession().getSessionFactory().close();
+////        for (int j = 0; j < 10; j++) {
+////        	WishDaoImp odi = new WishDaoImp();
+////        	cont +=1;
+////        	Wish w = odi.findById(44L);
+////        	System.out.println("Conexión: "+cont+" Place: "+w.getPlace());
+////        }
+        }
         
+//        WishDaoImp wdi = new WishDaoImp();
+//        Wish wish = wdi.findById(70L);
+//        Set<ItemWish> iws = wish.getItemOrders();
+//        for (ItemWish iw : iws) {
+//			System.out.println("id itemWish: "+iw.getIdItemOrder());
+//		}
         
     }
 }

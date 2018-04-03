@@ -5,6 +5,11 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import com.rolling.hibernate.dao.ItemWishDaoImp;
+import com.rolling.hibernate.dao.ProductDaoImp;
+import com.rolling.hibernate.dao.WishDaoImp;
+
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -171,6 +176,6 @@ public class VentanaMenu extends JFrame {
 	public void setActivoProductos(boolean activoProductos) {
 		this.activoProductos = activoProductos;
 	}
-	
-	
+
+
 }
